@@ -39,12 +39,6 @@ public class Account extends BaseEntityWithAudit {
     @JoinColumn(name = "member_id")
     private FamilyMember familyMember;
 
-    @Column(name = "created_at")
-    private java.time.LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private java.time.LocalDateTime updatedAt;
-
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<RoleAccount> roles = new ArrayList<>();
@@ -52,15 +46,4 @@ public class Account extends BaseEntityWithAudit {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Token> tokens = new ArrayList<>();
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = java.time.LocalDateTime.now();
-        updatedAt = java.time.LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = java.time.LocalDateTime.now();
-    }
 }
