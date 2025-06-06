@@ -11,14 +11,14 @@ import java.util.List;
  * Entity đại diện cho tài khoản người dùng trong hệ thống
  */
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(callSuper = true, exclude = {"roles", "tokens", "member"})
-@EqualsAndHashCode(callSuper = true, exclude = {"roles", "tokens", "member"})
+@ToString(callSuper = true, exclude = {"roles", "tokens", "familyMember"})
+@EqualsAndHashCode(callSuper = true, exclude = {"roles", "tokens", "familyMember"})
 public class Account extends BaseEntityWithAudit {
     
     @Id
@@ -26,20 +26,24 @@ public class Account extends BaseEntityWithAudit {
     @Column(name = "account_id")
     private Long accountID;
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
-
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Column(name = "full_name")
-    private String fullName;
-
-    @Column(name = "email")
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone")
-    private String phone;
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private Boolean status;
+
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private FamilyMember familyMember;
+
+    @Column(name = "created_at")
+    private java.time.LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private java.time.LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -49,6 +53,14 @@ public class Account extends BaseEntityWithAudit {
     @Builder.Default
     private List<Token> tokens = new ArrayList<>();
 
-    @OneToOne(mappedBy = "account")
-    private FamilyMember member;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = java.time.LocalDateTime.now();
+        updatedAt = java.time.LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = java.time.LocalDateTime.now();
+    }
 }

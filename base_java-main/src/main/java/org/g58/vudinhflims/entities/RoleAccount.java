@@ -1,48 +1,49 @@
 package org.g58.vudinhflims.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho mối quan hệ giữa Account và Role
  * Sử dụng composite key (accountID, roleID)
  */
 @Entity
-@Table(name = "role_account")
-@IdClass(RoleAccountId.class)
+@Table(name = "role_accounts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true, exclude = {"account", "role"})
-@EqualsAndHashCode(callSuper = true, exclude = {"account", "role"})
-public class RoleAccount extends BaseEntityWithAudit {
-    
+public class RoleAccount {
     @Id
-    @Column(name = "account_id", nullable = false)
-    private Long accountID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @Column(name = "role_id", nullable = false)
-    private Long roleID;
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "account_id",
-        referencedColumnName = "account_id",
-        insertable = false,
-        updatable = false
-    )
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "role_id",
-        referencedColumnName = "role_id",
-        insertable = false,
-        updatable = false
-    )
-    private Role role;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

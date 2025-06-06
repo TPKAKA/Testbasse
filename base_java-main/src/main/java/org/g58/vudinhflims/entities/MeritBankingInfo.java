@@ -1,35 +1,54 @@
 package org.g58.vudinhflims.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Entity
-@Table(name = "merit_banking_info")
+@Table(name = "merit_banking_infos")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true, exclude = {"merit"})
-@EqualsAndHashCode(callSuper = true, exclude = {"merit"})
-public class MeritBankingInfo extends BaseEntityWithAudit {
-    
+public class MeritBankingInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "merit_banking_info_id")
-    private Long meritBankingInfoID;
+    private Long id;
 
-    @Column(name = "account_number")
-    private String accountNumber;
+    @ManyToOne
+    @JoinColumn(name = "merit_id", nullable = false)
+    private Merit merit;
 
-    @Column(name = "bank_name")
+    @Column(name = "bank_name", nullable = false)
     private String bankName;
 
-    @Column(name = "note", columnDefinition = "TEXT")
-    private String note;
+    @Column(name = "account_number", nullable = false)
+    private String accountNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merit_id", referencedColumnName = "merit_id")
-    private Merit merit;
+    @Column(name = "account_holder", nullable = false)
+    private String accountHolder;
+
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 } 

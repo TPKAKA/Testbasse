@@ -5,20 +5,21 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * Entity đại diện cho thành viên trong gia đình
  */
 @Entity
-@Table(name = "family_member")
+@Table(name = "family_members")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(callSuper = true, exclude = {"family", "contact", "account", "memberEvents", "memberNotifications", "merits", "payerMerits", "husbandMarriages", "wifeMarriages"})
-@EqualsAndHashCode(callSuper = true, exclude = {"family", "contact", "account", "memberEvents", "memberNotifications", "merits", "payerMerits", "husbandMarriages", "wifeMarriages"})
+@ToString(callSuper = true, exclude = {"contact", "account", "memberEvents", "memberNotifications", "merits", "payerMerits", "husbandMarriages", "wifeMarriages"})
+@EqualsAndHashCode(callSuper = true, exclude = {"contact", "account", "memberEvents", "memberNotifications", "merits", "payerMerits", "husbandMarriages", "wifeMarriages"})
 public class FamilyMember extends BaseEntityWithAudit {
     
     @Id
@@ -59,10 +60,6 @@ public class FamilyMember extends BaseEntityWithAudit {
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "family_id", referencedColumnName = "family_id")
-    private Family family;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contact> contacts;
 
@@ -87,4 +84,21 @@ public class FamilyMember extends BaseEntityWithAudit {
 
     @OneToMany(mappedBy = "wife", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Marriage> wifeMarriages;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

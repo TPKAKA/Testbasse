@@ -38,24 +38,24 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponseDTO login(String username, String password) {
-        Account account = accountService.getAccountByUsername(username);
+    public TokenResponseDTO login(String email, String password) {
+        Account account = accountService.getAccountByEmail(email);
         if (account == null) {
             throw new RuntimeException("Account not found");
         }
 
         try {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password));
+                    new UsernamePasswordAuthenticationToken(email, password));
         } catch (BadCredentialsException ex) {
-            throw new RuntimeException("Invalid username or password");
+            throw new RuntimeException("Invalid email or password");
         }
 
         // Revoke all existing tokens for this account
         tokenService.revokeAllUserTokens(account);
 
-        String accessToken = jwtService.generateAccessToken(username);
-        String refreshToken = jwtService.generateRefreshToken(username);
+        String accessToken = jwtService.generateAccessToken(email);
+        String refreshToken = jwtService.generateRefreshToken(email);
 
         long refreshSeconds = jwtConfig.getRefreshExpiration() / 1000;
 

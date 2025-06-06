@@ -20,14 +20,14 @@ public class AccountController {
     }
 
     /**
-     * Lấy thông tin tài khoản theo username
-     * @param username Tên đăng nhập của tài khoản
+     * Lấy thông tin tài khoản theo email
+     * @param email Email của tài khoản
      * @return Thông tin tài khoản nếu tìm thấy, 404 nếu không tìm thấy
      */
-    @GetMapping("/{username}")
+    @GetMapping("/{email}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Account> getAccountByUsername(@PathVariable String username) {
-        Account account = accountService.getAccountByUsername(username);
+    public ResponseEntity<Account> getAccountByEmail(@PathVariable String email) {
+        Account account = accountService.getAccountByEmail(email);
         return account != null ? 
             ResponseEntity.ok(account) : 
             ResponseEntity.notFound().build();
@@ -35,19 +35,19 @@ public class AccountController {
 
     /**
      * Thay đổi mật khẩu của tài khoản
-     * @param username Tên đăng nhập của tài khoản
+     * @param email Email của tài khoản
      * @param oldPassword Mật khẩu cũ
      * @param newPassword Mật khẩu mới
      * @return 200 nếu thay đổi thành công, 400 nếu thất bại
      */
-    @PutMapping("/{username}/password")
-    @PreAuthorize("hasRole('ADMIN') or #username == authentication.principal.username")
+    @PutMapping("/{email}/password")
+    @PreAuthorize("hasRole('ADMIN') or #email == authentication.principal.username")
     public ResponseEntity<Void> changePassword(
-            @PathVariable String username,
+            @PathVariable String email,
             @RequestParam String oldPassword,
             @RequestParam String newPassword) {
         try {
-            accountService.changePassword(username, oldPassword, newPassword);
+            accountService.changePassword(email, oldPassword, newPassword);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -56,17 +56,17 @@ public class AccountController {
 
     /**
      * Cập nhật thông tin tài khoản
-     * @param username Tên đăng nhập của tài khoản
+     * @param email Email của tài khoản
      * @param updatedAccount Thông tin tài khoản cần cập nhật
      * @return Thông tin tài khoản sau khi cập nhật nếu thành công, 400 nếu thất bại
      */
-    @PutMapping("/{username}")
-    @PreAuthorize("hasRole('ADMIN') or #username == authentication.principal.username")
+    @PutMapping("/{email}")
+    @PreAuthorize("hasRole('ADMIN') or #email == authentication.principal.username")
     public ResponseEntity<Account> updateAccount(
-            @PathVariable String username,
+            @PathVariable String email,
             @RequestBody Account updatedAccount) {
         try {
-            Account account = accountService.updateAccount(username, updatedAccount);
+            Account account = accountService.updateAccount(email, updatedAccount);
             return ResponseEntity.ok(account);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();

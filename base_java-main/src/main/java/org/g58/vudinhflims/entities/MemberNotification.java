@@ -1,48 +1,52 @@
 package org.g58.vudinhflims.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
 /**
  * Entity đại diện cho mối quan hệ giữa Member và Notification
  * Sử dụng composite key (memberID, notificationID)
  */
 @Entity
-@Table(name = "member_notification")
-@IdClass(MemberNotificationId.class)
+@Table(name = "member_notifications")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true, exclude = {"member", "notification"})
-@EqualsAndHashCode(callSuper = true, exclude = {"member", "notification"})
-public class MemberNotification extends BaseEntityWithAudit {
-    
+public class MemberNotification {
     @Id
-    @Column(name = "member_id", nullable = false)
-    private Long memberID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @Column(name = "notification_id", nullable = false)
-    private Long notificationID;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "member_id",
-        referencedColumnName = "member_id",
-        insertable = false,
-        updatable = false
-    )
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
     private FamilyMember member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "notification_id",
-        referencedColumnName = "notification_id",
-        insertable = false,
-        updatable = false
-    )
+    @ManyToOne
+    @JoinColumn(name = "notification_id", nullable = false)
     private Notification notification;
+
+    @Column(name = "is_read", nullable = false)
+    private Boolean isRead;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -21,13 +21,13 @@ public class AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Account getAccountByUsername(String username) {
-        return accountRepository.findByUsername(username)
+    public Account getAccountByEmail(String email) {
+        return accountRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
     }
 
-    public void changePassword(String username, String oldPassword, String newPassword) {
-        Account account = getAccountByUsername(username);
+    public void changePassword(String email, String oldPassword, String newPassword) {
+        Account account = getAccountByEmail(email);
         
         if (!passwordEncoder.matches(oldPassword, account.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
@@ -37,12 +37,11 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public Account updateAccount(String username, Account updatedAccount) {
-        Account existingAccount = getAccountByUsername(username);
+    public Account updateAccount(String email, Account updatedAccount) {
+        Account existingAccount = getAccountByEmail(email);
         
-        existingAccount.setFullName(updatedAccount.getFullName());
         existingAccount.setEmail(updatedAccount.getEmail());
-        existingAccount.setPhone(updatedAccount.getPhone());
+        existingAccount.setStatus(updatedAccount.getStatus());
         
         return accountRepository.save(existingAccount);
     }
@@ -52,8 +51,8 @@ public class AccountService {
     }
 
     public Account createAccount(Account account) {
-        if (accountRepository.existsByUsername(account.getUsername())) {
-            throw new RuntimeException("Username already exists");
+        if (accountRepository.existsByEmail(account.getEmail())) {
+            throw new RuntimeException("Email already exists");
         }
         
         account.setPassword(passwordEncoder.encode(account.getPassword()));

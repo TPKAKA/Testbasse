@@ -1,42 +1,52 @@
 package org.g58.vudinhflims.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
-@Table(name = "merit_spending")
+@Table(name = "merit_spendings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true, exclude = {"merit", "meritEvent"})
-@EqualsAndHashCode(callSuper = true, exclude = {"merit", "meritEvent"})
-public class MeritSpending extends BaseEntityWithAudit {
-    
+public class MeritSpending {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "merit_spending_id")
-    private Long meritSpendingID;
+    private Long id;
 
-    @Column(name = "amount", precision = 10, scale = 2)
+    @ManyToOne
+    @JoinColumn(name = "merit_id", nullable = false)
+    private Merit merit;
+
+    @ManyToOne
+    @JoinColumn(name = "merit_event_id", nullable = false)
+    private MeritEvent meritEvent;
+
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "spending_date")
-    private LocalDate spendingDate;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merit_id", referencedColumnName = "merit_id")
-    private Merit merit;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "merit_event_id", referencedColumnName = "merit_event_id")
-    private MeritEvent meritEvent;
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 } 

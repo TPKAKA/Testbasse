@@ -1,8 +1,11 @@
 package org.g58.vudinhflims.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "member_event")
@@ -10,21 +13,37 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-@ToString(callSuper = true, exclude = {"member", "event"})
-@EqualsAndHashCode(callSuper = true, exclude = {"member", "event"})
-public class MemberEvent extends BaseEntityWithAudit {
-    
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
-    private FamilyMember member;
+public class MemberEvent {
+    @EmbeddedId
+    private MemberEventId id;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("eventId")
     @JoinColumn(name = "event_id", referencedColumnName = "event_id")
     private FamilyEvent event;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("memberId")
+    @JoinColumn(name = "member_id", referencedColumnName = "member_id")
+    private FamilyMember member;
+
     @Column(name = "is_going")
     private Boolean isGoing;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 } 

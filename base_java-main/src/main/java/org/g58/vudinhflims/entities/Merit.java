@@ -6,23 +6,24 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "merit")
+@Table(name = "merits")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@ToString(callSuper = true, exclude = {"meritEvent", "payerMember", "member", "meritType", "meritSpendings", "meritBankingInfos"})
-@EqualsAndHashCode(callSuper = true, exclude = {"meritEvent", "payerMember", "member", "meritType", "meritSpendings", "meritBankingInfos"})
-public class Merit extends BaseEntityWithAudit {
+@ToString(exclude = {"meritEvent", "payerMember", "member", "meritType", "meritSpendings", "meritBankingInfos"})
+@EqualsAndHashCode(exclude = {"meritEvent", "payerMember", "member", "meritType", "meritSpendings", "meritBankingInfos"})
+public class Merit {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "merit_id")
-    private Long meritID;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merit_event_id", referencedColumnName = "merit_event_id")
@@ -60,4 +61,21 @@ public class Merit extends BaseEntityWithAudit {
 
     @OneToMany(mappedBy = "merit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MeritBankingInfo> meritBankingInfos;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 } 
